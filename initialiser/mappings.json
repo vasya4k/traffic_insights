@@ -1,0 +1,184 @@
+{
+    "properties": {
+        "bytes": {
+            "type": "long"
+        },
+        "dst_addr": {
+            "type": "text",
+            "fields": {
+                "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                }
+            }
+        },
+        "dst_device": {
+            "type": "text",
+            "fields": {
+                "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                }
+            }
+        },
+        "dst_mac": {
+            "type": "text",
+            "fields": {
+                "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                }
+            }
+        },
+        "dst_port": {
+            "type": "long"
+        },
+        "etype": {
+            "type": "long"
+        },
+        "ipttl": {
+            "type": "long"
+        },
+        "ipv6_flow_label": {
+            "type": "long"
+        },
+        "out_if": {
+            "type": "long"
+        },
+        "packets": {
+            "type": "long"
+        },
+        "protocol": {
+            "type": "long"
+        },
+        "sampler_address": {
+            "type": "text",
+            "fields": {
+                "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                }
+            }
+        },
+        "sampling_rate": {
+            "type": "long"
+        },
+        "sequence_num": {
+            "type": "long"
+        },
+        "src_addr": {
+            "type": "text",
+            "fields": {
+                "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                }
+            }
+        },
+        "src_device": {
+            "type": "text",
+            "fields": {
+                "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                }
+            }
+        },
+        "src_mac": {
+            "type": "text",
+            "fields": {
+                "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                }
+            }
+        },
+        "src_port": {
+            "type": "long"
+        },
+        "tcp_flags": {
+            "type": "long"
+        },
+        "time_flow_end": {
+            "type": "long"
+        },
+        "TimeReceived": {
+            "type": "long"
+        },
+        "Type": {
+            "type": "long"
+        },
+        "dst_as": {
+            "type": "long"
+        },
+        "dst_city": {
+            "type": "text",
+            "fields": {
+                "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                }
+            }
+        },
+        "dst_country": {
+            "type": "text",
+            "fields": {
+                "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                }
+            }
+        },
+        "dst_location": {
+            "type": "geo_point",
+            "ignore_malformed": true
+        },
+        "dst_org": {
+            "type": "text",
+            "fields": {
+                "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                }
+            }
+        },
+        "src_as": {
+            "type": "long"
+        },
+        "src_city": {
+            "type": "text",
+            "fields": {
+                "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                }
+            }
+        },
+        "src_country": {
+            "type": "text",
+            "fields": {
+                "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                }
+            }
+        },
+        "src_location": {
+            "type": "geo_point",
+            "ignore_malformed": true
+        },
+        "src_org": {
+            "type": "text",
+            "fields": {
+                "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                }
+            }
+        },
+        "timestamp": {
+            "type": "date",
+            "format": "epoch_millis"
+        }
+    }
+}

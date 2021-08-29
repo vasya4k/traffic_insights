@@ -1,0 +1,101 @@
+version: "3"
+services:
+  zookeeper:
+    image: "bitnami/zookeeper:latest"
+    ports:
+      - "2181:2181"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    restart: always
+
+  kafka:
+    image: "bitnami/kafka:latest"
+    ports:
+      - "9093:9093"
+    environment:
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_DELETE_TOPIC_ENABLE=true
+      - KAFKA_LISTENERS=LISTENER_EXT://:9093,LISTENER_INT://kafka:9092
+      - KAFKA_ADVERTISED_LISTENERS=LISTENER_EXT://127.0.0.1:9093,LISTENER_INT://kafka:9092
+      - KAFKA_INTER_BROKER_LISTENER_NAME=LISTENER_INT
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=LISTENER_EXT:PLAINTEXT,LISTENER_INT:PLAINTEXT
+
+    restart: always
+    depends_on:
+      - "zookeeper"
+
+  goflow:
+    image: "cloudflare/goflow:latest"
+    ports:
+      - "5678:5678/udp"
+      - "2055:2055/udp"
+    restart: always
+    entrypoint: "/bin/sh"
+    command: >
+      -c "sleep 15 ;
+      /goflow -sflow.port 5678 -kafka.brokers kafka:9092
+      -kafka.topic flows
+      "
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.0
+    container_name: es01
+    restart: always
+    environment:
+      - node.name=es01
+      - "discovery.type=single-node"
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data01:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - elastic
+
+  kib01:
+    image: docker.elastic.co/kibana/kibana:7.9.0
+    container_name: kib01
+    restart: always
+    ports:
+      - 5601:5601
+    environment:
+      ELASTICSEARCH_URL: http://es01:9200
+      ELASTICSEARCH_HOSTS: http://es01:9200
+    networks:
+      - elastic
+
+  nginx:
+    image: nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/.htpasswd:/etc/nginx/.htpasswd
+    ports:
+      - "8080:80"
+    restart: always
+    depends_on:
+      - "kib01"
+    networks:
+      - elastic
+
+  initialiser:
+    build:
+      context: ./initialiser
+      dockerfile: Dockerfile
+    container_name: flow-init
+    depends_on:
+      - "kib01"
+    networks:
+      - elastic
+
+volumes:
+  data01:
+    driver: local
+
+networks:
+  elastic:
+    driver: bridge
