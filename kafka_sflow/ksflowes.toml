@@ -1,0 +1,17 @@
+[kafka]
+  brokers = ["127.0.0.1:9093"]
+  user = ""
+  password = ""
+  group = "chetki"
+  topic = "flows"
+
+[elastic]
+  address = "127.0.0.1"
+  port = "9200"
+  index = "sflow"
+  geoip = false
+  ipdb = "./GeoLite2-City.mmdb"
+  asndb = "./GeoLite2-ASN.mmdb"
+
+[mac]
+  "baa43ssc4ewe" = "phone"

@@ -92,6 +92,22 @@ services:
     networks:
       - elastic
 
+  sflow_consumer:
+    image: vasya4k/kafkasflowes:latest
+    volumes:
+      - ./kafka_sflow/ksflowes.toml:/ksflowes.toml
+      # - ./kafka_sflow/GeoLite2-ASN.mmdb:/GeoLite2-ASN.mmdb
+      # - ./kafka_sflow/GeoLite2-City.mmdb:/GeoLite2-City.mmdb      
+    ports:
+      - "8080:80"
+    restart: always
+    depends_on:
+      - "kib01"
+    networks:
+      - elastic
+
+
+
 volumes:
   data01:
     driver: local
