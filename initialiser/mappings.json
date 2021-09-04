@@ -102,10 +102,10 @@
         "time_flow_end": {
             "type": "long"
         },
-        "TimeReceived": {
+        "time_received": {
             "type": "long"
         },
-        "Type": {
+        "type": {
             "type": "long"
         },
         "dst_as": {
