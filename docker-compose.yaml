@@ -4,6 +4,8 @@ services:
     image: "bitnami/zookeeper:latest"
     ports:
       - "2181:2181"
+    networks:
+      - sflow  
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
     restart: always
@@ -12,6 +14,8 @@ services:
     image: "bitnami/kafka:latest"
     ports:
       - "9093:9093"
+    networks:
+      - sflow  
     environment:
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
       - ALLOW_PLAINTEXT_LISTENER=yes
@@ -30,6 +34,8 @@ services:
     ports:
       - "5678:5678/udp"
       - "2055:2055/udp"
+    networks:
+      - sflow  
     restart: always
     entrypoint: "/bin/sh"
     command: >
@@ -37,6 +43,9 @@ services:
       /goflow -sflow.port 5678 -kafka.brokers kafka:9092
       -kafka.topic flows
       "
+    depends_on:
+      - "zookeeper"  
+  
   es01:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.9.0
     container_name: es01
@@ -55,19 +64,17 @@ services:
     ports:
       - 9200:9200
     networks:
-      - elastic
+      - sflow
 
   kib01:
     image: docker.elastic.co/kibana/kibana:7.9.0
     container_name: kib01
-    restart: always
-    ports:
-      - 5601:5601
+    restart: always    
     environment:
       ELASTICSEARCH_URL: http://es01:9200
       ELASTICSEARCH_HOSTS: http://es01:9200
     networks:
-      - elastic
+      - sflow
 
   nginx:
     image: nginx
@@ -80,7 +87,7 @@ services:
     depends_on:
       - "kib01"
     networks:
-      - elastic
+      - sflow
 
   initialiser:
     build:
@@ -89,22 +96,24 @@ services:
     container_name: flow-init
     depends_on:
       - "kib01"
+      - "es01"
     networks:
-      - elastic
+      - sflow
 
   sflow_consumer:
     image: vasya4k/kafkasflowes:latest
     volumes:
       - ./kafka_sflow/ksflowes.toml:/ksflowes.toml
-      # - ./kafka_sflow/GeoLite2-ASN.mmdb:/GeoLite2-ASN.mmdb
-      # - ./kafka_sflow/GeoLite2-City.mmdb:/GeoLite2-City.mmdb      
-    ports:
-      - "8080:80"
+      - ./kafka_sflow/GeoLite2-ASN.mmdb:/GeoLite2-ASN.mmdb
+      - ./kafka_sflow/GeoLite2-City.mmdb:/GeoLite2-City.mmdb    
     restart: always
     depends_on:
+      - "kafka"
+      - "es01"
       - "kib01"
+      - "initialiser"
     networks:
-      - elastic
+      - sflow
 
 
 
@@ -113,5 +122,5 @@ volumes:
     driver: local
 
 networks:
-  elastic:
+  sflow:
     driver: bridge
