@@ -94,3 +94,4 @@ Move back into traffic_insights dir and run docker-compose up --force-recreate
 
 ## What is next
 
+Navigate to yourboxip:8080 to log in to Kibana. 
