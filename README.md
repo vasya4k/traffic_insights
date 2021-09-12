@@ -1,4 +1,4 @@
-# traffic insights
+# Traffic Insights
 
 This repository contains a project to create a pipeline to ingest and process sFlow data.
 All the components apart from pmacct are running using docker-compose. 
@@ -40,7 +40,7 @@ The exporter(kafkasflowes) will query GeoIP DB and add info about countries, ASN
 
 
 ## Config example for accounting daemon pmacctd 
-
+```
 cat /etc/pmacct/pmacctd.conf
       ! pmacctd configuration
       daemonize: true
@@ -55,13 +55,14 @@ cat /etc/pmacct/pmacctd.conf
       sfprobe_agentsubid: 1402
       ! destination for sFlow data 
       sfprobe_receiver: [127.0.0.1]:5678
+```
 
 To install pmacct on Ubuntu: 
 
-sudo apt install pmacct
+```sudo apt install pmacct ```
 
 Once you have installed pmacct you should check that it is running.
-
+```
 sudo systemctl status pmacctd.service
 [sudo] password for bob:
 ● pmacctd.service - promiscuous mode accounting daemon
@@ -76,20 +77,49 @@ sudo systemctl status pmacctd.service
 
 Aug 11 18:48:50 bob4k systemd[1]: Starting promiscuous mode accounting daemon...
 Aug 11 18:48:51 bob4k pmacctd[1252]: INFO ( default/core ): Start logging ...
-Aug 11 18:48:51 bob4k pmacctd[1252]: INFO ( default/core ): Promiscuous Mode Accounting Daemon, pmacctd 1.7.2-git (20181018-00+c3)
-Aug 11 18:48:51 bob4k pmacctd[1252]: INFO ( default/core ):  '--build=x86_64-linux-gnu' '--prefix=/usr' '--includedir=${prefix}/include' '--mandir=${prefix}/share/man' '--infodir=${prefix}/share/info' '--sysconfdir=/etc' '--localstatedir=/var' '--disable-silent-rules' '--libdir=${prefix}/lib/x86_64-linux-gnu' '--libexecdir=${prefix}/lib/>
+Aug 11 18:48:51 bob4k pmacctd[1252]: INFO ( default/core ): Promiscuous Mode Accounting Daemon, pmacctd 1.7.2-git
 Aug 11 18:48:51 bob4k pmacctd[1252]: INFO ( default/core ): Reading configuration file '/etc/pmacct/pmacctd.conf'.
 Aug 11 18:48:51 bob4k pmacctd[1253]: INFO ( default_sfprobe/sfprobe ): Exporting flows to [0.0.0.0]:5678
 Aug 11 18:48:51 bob4k pmacctd[1253]: INFO ( default_sfprobe/sfprobe ): Sampling at: 1/5
 Aug 11 18:48:51 bob4k systemd[1]: Started promiscuous mode accounting daemon.
 Aug 11 18:48:51 bob4k pmacctd[1252]: INFO ( default/core ): [eth0,0] link type is: 1
 Aug 11 18:48:51 bob4k pmacctd[1252]: WARN ( default/core ): eth0: no IPv4 address assigned
+```
+
+Example bridge config for Ubuntu 20.04
+
+```
+λ bob4k ~ → cat /etc/netplan/01-netcfg.yaml
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    enx48d705e901d9:
+      dhcp4: no
+    eth0:
+      dhcp4: no
+  bridges:
+    br0:
+      addresses:
+       - 192.168.1.250/24
+      gateway4: 192.168.1.1
+      interfaces:
+        - eth0
+        - enx48d705e901d9
+      nameservers:
+        addresses: [ "8.8.8.8", "8.8.4.4" ]
+```
 
 ## How to run 
 
-First, if you want geolocation to work you need to download the database files from https://dev.maxmind.com/geoip/geolite2-free-geolocation-data 
+First, if you want geolocation to work you need to download the database files from [maxmind.com](https://dev.maxmind.com/geoip/geolite2-free-geolocation-data "maxmind website")  
+
 Next, move into the nginx dir and change the password using htpasswd -b .htpasswd username password. You might need to install htpasswd tool. 
-Update router mac address in the mac table. Then change the working directory to kafka_sflow open ksflowes.toml file set geoip = true if you downloaded the DB files. 
+
+Update router mac address in the mac table. 
+
+Then change the working directory to kafka_sflow open ksflowes.toml file set geoip = true if you downloaded the DB files. 
+
 Move back into traffic_insights dir and run docker-compose up --force-recreate 
 
 ## What is next
